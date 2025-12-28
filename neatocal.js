@@ -133,7 +133,7 @@ function localized_month(locale, mo_idx) {
   return d.toLocaleDateString(locale, {"month":"short"});
 }
 
-function neatocal_euro() {
+function neatocal_hallon_almanackan() {
   let year      = NEATOCAL_PARAM.year;
   let start_mo  = NEATOCAL_PARAM.start_month;
   let n_mo      = NEATOCAL_PARAM.n_month;
@@ -598,6 +598,7 @@ function neatocal_init() {
     if      (_l == "default")           { layout = "default"; }
     else if (_l == "aligned-weekdays")  { layout = "aligned-weekdays"; }
     else if (_l == "euro")              { layout = "euro"; }
+    else if (_l == "hallon-almanackan") { layout = "hallon-almanackan"; }
   }
   NEATOCAL_PARAM.layout = layout;
 
@@ -774,8 +775,8 @@ function neatocal_render() {
   if (layout == "aligned-weekdays") {
     neatocal_aligned_weekdays();
   }
-  else if (layout == "euro") {
-    neatocal_euro();
+  else if ((layout == "euro") || (layout == "hallon-almanackan")) {
+    neatocal_hallon_almanackan();
   }
   else {
     neatocal_default();

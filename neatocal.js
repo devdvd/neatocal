@@ -59,7 +59,7 @@ var NEATOCAL_PARAM = {
   "start_day": 1,
 
   // calendar format
-  // 
+  //
   //   default
   //   aligned-weekdays
   //
@@ -79,7 +79,7 @@ var NEATOCAL_PARAM = {
   //
   "month_code": [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
 
-  // 
+  //
   "language" : "",
 
   // start month (0 indexed)
@@ -94,7 +94,11 @@ var NEATOCAL_PARAM = {
 
   // weekend highlight color
   //
-  "highlight_color": '#eee'
+  "highlight_color": '#eee',
+
+  // show week numbers
+  //
+  "show_week_numbers": false
 
 };
 
@@ -229,8 +233,8 @@ function neatocal_hallon_almanackan() {
         td.appendChild( span_date );
         td.appendChild( span_day );
 
-        if (dt.getDay() == 1) {
-          let span_week_no = H.span(day_week_no[cur_mo][idx], "date");
+        if ((dt.getDay() == 1) && NEATOCAL_PARAM.show_week_numbers) {
+          let span_week_no = H.span(getISOWeekNumber(dt), "date");
           span_week_no.style.float = "right";
           span_week_no.style.color = "rgb(230,37,7)";
           td.appendChild(span_week_no);
@@ -312,6 +316,13 @@ function neatocal_default() {
         td.appendChild( span_date );
         td.appendChild( span_day );
 
+        if (dt.getDay() == 1 && NEATOCAL_PARAM.show_week_numbers) {
+          let span_week_no = H.span(getISOWeekNumber(dt), "date");
+          span_week_no.style.float = "right";
+          span_week_no.style.color = "rgb(230,37,7)";
+          td.appendChild(span_week_no);
+        }
+
         let yyyy_mm_dd = fmt_date(cur_year, cur_mo+1, idx+1);
         if (yyyy_mm_dd in NEATOCAL_PARAM.data) {
           let txt = H.div();
@@ -343,6 +354,17 @@ function fmt_date(y,m,d) {
   }
   res += d.toString();
   return res;
+}
+
+function getISOWeekNumber(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  // Set to nearest Thursday: current date + 4 - current day number (Mon=1, Sun=7)
+  const dayNum = d.getUTCDay() || 7; // Convert Sunday from 0 to 7
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  // Get first day of year
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  // Calculate full weeks from year start to nearest Thursday
+  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 }
 
 function neatocal_aligned_weekdays() {
@@ -431,6 +453,13 @@ function neatocal_aligned_weekdays() {
 
         td.appendChild( span_date );
         td.appendChild( span_day );
+
+        if (dt.getDay() == 1 && NEATOCAL_PARAM.show_week_numbers) {
+          let span_week_no = H.span(getISOWeekNumber(dt), "date");
+          span_week_no.style.float = "right";
+          span_week_no.style.color = "rgb(230,37,7)";
+          td.appendChild(span_week_no);
+        }
 
         let yyyy_mm_dd = fmt_date(cur_year, cur_mo+1, day_idx+1);
         if (yyyy_mm_dd in NEATOCAL_PARAM.data) {
@@ -560,6 +589,8 @@ function neatocal_init() {
   let weekday_code_param = sp.get("weekday_code");
   let month_code_param = sp.get("month_code");
   let language_param = sp.get("language");
+  let show_week_numbers_param = sp.get("show_week_numbers");
+  console.log({show_week_numbers_param})
 
   let datafn_param = sp.get("data");
 
@@ -711,6 +742,8 @@ function neatocal_init() {
   }
   NEATOCAL_PARAM.month_code = month_code;
 
+  NEATOCAL_PARAM.show_week_numbers = show_week_numbers_param === "true";
+
   //---
 
   // if we have a data file, short circuit to wait till load.
@@ -784,4 +817,3 @@ function neatocal_render() {
 
   neatocal_post_process();
 }
-
